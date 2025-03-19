@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+///migration: são históricos de modigicação do banco de dados
+
+//npx prisma migrate dev comando
+
+//função map avisa o prisma para mudar o nome da tabela no banco de dados.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum Role {
+  USER 
+  ADMIN
+}
+model User {
+  id Int @id @default(autoincrement())
+  status Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime@default(now()) @updatedAt
+  role Role @default(USER)
+  name String 
+  email String @unique
+  posts Post[]
+
+
+  @@map("users")
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+  title String
+  subtitle String?
+  body String
+  userId Int
+  author User @relation(fields: [userId], references: [id])
+
+  @@map("posts")
+}
