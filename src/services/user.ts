@@ -16,3 +16,20 @@ export const createUser = async (data: Prisma.UserCreateInput) => {
         return false
     }
 }
+//skipDuplicate, ele nao deixará passar os que são iguais (duplicadas)
+export const createUsers = async (users: Prisma.UserCreateInput[]) => {
+    try{
+        return await prisma.user.createMany({
+            data: users, 
+            skipDuplicates: true
+        })
+    }catch( error){
+        return false
+    }
+}
+
+//pegando todos ussuários
+export const getAllUsers = async () => {
+    const users = await prisma.user.findMany({})
+    return users
+}
