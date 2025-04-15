@@ -1,0 +1,5 @@
+GT = Greater then = > 
+GTE = Greater then or equal = >=
+LT: Lower then = <
+LTE: Lower then or equal = <=
+startsWith = começa com

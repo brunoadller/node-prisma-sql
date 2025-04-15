@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../libs/prisma';
-import { createUser, createUsers } from '../services/user';
+import { createUser, createUsers, getAllUsers, getAllUsersFilter, getAllUsersForRelations, getUserByEmail, getUserFilterFromOr } from '../services/user';
 
 export const mainRouter = Router();
 //COPIAR O CÓDIGO APP.TS NO CAMINHO PRISMA -> PRODUCTS -> ORM -> SETUP E ACONFIIGURATION -> DATABASE CONNECTIONS. 
@@ -11,7 +11,7 @@ export const mainRouter = Router();
 mainRouter.post('/user', async (req, res) => {
     const user = await createUser({
         name: 'Felipe 2',
-        email: 'felipebssrdnt@gmail.com',
+        email: 'felipebssrdnt@hotmail.com',
         status: false,
         posts: {
             create:{
@@ -45,8 +45,31 @@ mainRouter.post('/users', async (req, res) => {
 })
 
 mainRouter.get('/users', async (req, res) => {
-    const user = await prisma.user.findMany()
-    res.json({user})
+    const result = await getAllUsers()
+
+    res.json({result})
+})
+
+mainRouter.get('/user', async (req, res) => {
+    const result  = await getUserByEmail('joao@gmail.com')
+
+    res.json({result})
+})
+
+mainRouter.get('/usersFilter', async (req, res) => {
+    const result = await getAllUsersFilter()
+    res.json({result})
+})
+
+mainRouter.get('/usersFilterFromOr', async (req, res) => {
+    const result = await getUserFilterFromOr()
+
+    res.json({result})
+})
+mainRouter.get('/usersForRelations', async (req, res) => {
+    const result = await getAllUsersForRelations()
+
+    res.json({result})
 })
 /*
 
