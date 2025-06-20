@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../libs/prisma';
-import { createUser, createUsers, getAllUsers, getAllUsersFilter, getAllUsersForRelations, getUserByEmail, getUserFilterFromOr } from '../services/user';
+import { createUser, createUserFromUpsert, createUsers, getAllUsers, getAllUsersFilter, getAllUsersForAsc, getAllUsersForDesc, getAllUsersForRelations, getExercicioPagination, getUserByEmail, getUserFilterFromOr, getUserForPagination, getUserForPaginationForSkip, getUserForPaginationForTake, getUsersForPaginationTakeAndSkip, updateUser } from '../services/user';
 
 export const mainRouter = Router();
 //COPIAR O CÓDIGO APP.TS NO CAMINHO PRISMA -> PRODUCTS -> ORM -> SETUP E ACONFIIGURATION -> DATABASE CONNECTIONS. 
@@ -9,7 +9,7 @@ export const mainRouter = Router();
 //adicionar o comando watch para não precisar atualizar o nservidor manualmente npm i -D tsx, depois ir em package json para verificar como está a configuração do scriptf
 
 mainRouter.post('/user', async (req, res) => {
-    const user = await createUser({
+    const user = await createUserFromUpsert({
         name: 'Felipe 2',
         email: 'felipebssrdnt@hotmail.com',
         status: false,
@@ -68,9 +68,15 @@ mainRouter.get('/usersFilterFromOr', async (req, res) => {
 })
 mainRouter.get('/usersForRelations', async (req, res) => {
     const result = await getAllUsersForRelations()
+    res.json({result})
+})
+/*
+mainRouter.get('/usersForRelations', async (req, res) => {
+    const result = await getAllUsersForRelations()
 
     res.json({result})
 })
+
 /*
 
 CÓDIGO DE FORMA SIMPLIFICADA
@@ -86,3 +92,36 @@ mainRouter.post('/user', async ( req, res) => {
 })
 
 */
+
+mainRouter.get('/allusersfordesc', async (req, res) => {
+    const usersOrderDesc = await getAllUsersForDesc()
+    res.json({usersOrderDesc})
+})
+mainRouter.get('/allusersforasc', async (req, res) => {
+    const usersOrderAsc = await getAllUsersForAsc()
+    res.json({usersOrderAsc})
+})
+mainRouter.get('/getusersforpaginationforskip', async (req, res) => {
+    const users = await getUserForPaginationForSkip()
+
+    res.json({users})
+})
+mainRouter.get('/getusersforpaginationfortake', async (req, res) =>{
+    const users = await getUserForPaginationForTake()
+    res.json({users})
+})
+mainRouter.get('/getusersforpaginationskipandtake', async (req, res) => {
+    const users = await getUsersForPaginationTakeAndSkip()
+    res.json({users})
+})
+//rota do exxercicio de setar a página e vir os ususários por pagína
+mainRouter.get('/setpagina', async (req, res) => {
+    const pageValue = req.query.page 
+    const usersPage = await getExercicioPagination(Number(pageValue))
+    res.json({usersPage})
+})
+
+mainRouter.put('/user', async (req, res) => {
+    const result = await updateUser()
+    res.json({result})
+})

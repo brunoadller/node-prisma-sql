@@ -7,6 +7,21 @@ type CreateUserProps = {
     name: string,
     email: string
 }
+export const createUserFromUpsert = async (data: Prisma.UserCreateInput) => {
+   //se achar, atualiza com o dado
+   //se não achar cria um usuário
+    const result = await prisma.user.upsert({
+        where:{
+            email: data.email
+        },
+        update:{
+            name: 'ricardo'
+        },
+        create: data
+
+
+    })
+}
 export const createUser = async (data: Prisma.UserCreateInput) => {
     try{
         const user = await prisma.user.create({data})
@@ -29,14 +44,20 @@ export const createUsers = async (users: Prisma.UserCreateInput[]) => {
 }
 
 //pegando todos ussuários
-export const getAllUsers = async () => {
+export const getAllUsers = async () => { 
     //select serve para pegar os campos que desejo, o true confirma que quer
     const users = await prisma.user.findMany({
         select: {
             id: true,
             name: true,
             email: true,
-             status: true
+            posts: {
+                
+                select:{
+                    id: true,
+                    title: true
+                }
+            }
         }
     })
     return users
@@ -102,6 +123,7 @@ export const getUserFilterFromOr = async () => {
 
     return users
 }
+/*
 export const getAllUsersForRelations = async () => {
     const users = await prisma.user.findMany({
         where:{
@@ -123,3 +145,102 @@ export const getAllUsersForRelations = async () => {
     })
     return users
 }
+*/
+//Seleciona o usuário por relação, ou seja, quero que selecione o usuário
+//onde os posts tenham o título que começem com "Titulo", por exemplo.
+export const getAllUsersForRelations = async () => {
+    const users = await prisma.user.findMany({
+        where:{
+            posts:{
+                some:{
+                    title:{
+                        startsWith: 'Titulo'
+                    }
+                }
+            }
+        },
+        select:{
+            id: true,
+            name: true,
+            email: true,
+            status: true,
+            posts: true
+        }
+    })
+    return users
+}
+
+/*
+Para ordenar, é nece´sario colocar na consultar
+orderBy:{
+    name:'asc' ou 'desc' Ascendente (crsescente) Descrescente respectivamente 
+}
+*/
+//selciona os usuários de forma decrescente
+export const getAllUsersForDesc = async () => {
+    const users = await prisma.user.findMany({
+        orderBy:{
+            name: 'desc'
+        }
+    })
+    return users
+}
+export const getAllUsersForAsc = async () => {
+    const users = await prisma.user.findMany({
+        orderBy:{
+            name: 'asc'        }
+    })
+    return users
+}
+//Realizando paginação pulando os usuários
+export const getUserForPaginationForSkip = async  () => {
+    const users = await prisma.user.findMany({
+        skip: 0
+    })
+    return users
+}
+
+//realizando paginação pegando uma quantidade x de usuários
+export const getUserForPaginationForTake = async () => {
+    const users = await prisma.user.findMany({
+        take: 2
+    })
+    return users
+}
+//realizando paginação pulando 1 com skip e pegando os próximos 2 por exemplo com take
+export const getUsersForPaginationTakeAndSkip = async () => {
+    let page = 5
+    let skip = (page - 1) * 2
+      const users = await prisma.user.findMany({
+        skip: skip,
+        take: 2
+    })
+    return users
+}
+
+//exercicio get paginaação via url
+export const getExercicioPagination  = async (page: number) => {
+    let perPage = 2
+    let skipPage = (page - 1) * perPage
+    //take quero pular de dois em dois, mas poderia ser uma constante
+    //skippage é para que o usuário consiga colocar pagia 1 2 e ect sem se precoupar com a posição
+    const users = await prisma.user.findMany({
+        skip: skipPage,
+        take: perPage
+    })
+    return users
+}
+
+//atualizando usuário
+export const updateUser = async () => {
+    const updatedUser = await prisma.user.update({
+        where:{
+          id: 5
+        },
+        data:{
+            name: 'Juca'
+        }
+    })
+    return updatedUser
+}
+
